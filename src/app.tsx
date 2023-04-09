@@ -14,7 +14,7 @@ import {
 	$files,
 	newFile,
 	openFile,
-	setCurrentFile,
+	setFiles,
 } from "./stores/file";
 import { $router } from "./stores/router";
 import { cn } from "./utils";
@@ -145,7 +145,7 @@ function Layout({ children }: { children: React.ReactNode }) {
 				<header className="sticky top-0 flex shrink-0 items-center justify-between gap-x-4 border-b border-gray-6 bg-gray-2 px-4 py-2 shadow-sm sm:gap-x-6 sm:px-6 lg:px-8">
 					<Select
 						value={currentFile}
-						onValueChange={(value) => setCurrentFile(value)}
+						onValueChange={(value) => setFiles(value)}
 					>
 						<SelectTrigger className="max-w-md">
 							<SelectValue placeholder="Select a fruit" />

@@ -1,5 +1,5 @@
 import { DialogFilter, open, save } from "@tauri-apps/api/dialog";
-import { action, atom, onMount } from "nanostores";
+import { action, atom, computed } from "nanostores";
 import { Store } from "tauri-plugin-store-api";
 
 const localStore = new Store(".local-kv");
@@ -8,8 +8,8 @@ export const $files = atom<string[]>(
 	(await localStore.get<string[]>("files")) ?? [],
 );
 
-export const $currentFile = atom<string | undefined>(
-	(await localStore.get<string>("currentFile")) ?? undefined,
+export const $currentFile = computed($files, (files) =>
+	files.length > 0 ? files[0] : undefined,
 );
 
 export const setFiles = action(
@@ -25,16 +25,6 @@ export const setFiles = action(
 	},
 );
 
-export const setCurrentFile = action(
-	$currentFile,
-	"setCurrentFile",
-	async (store, filePath: string) => {
-		await setFiles(filePath);
-		await localStore.set("currentFile", filePath);
-		store.set(filePath);
-	},
-);
-
 const dialogFilters: DialogFilter[] = [
 	{
 		name: "SQLite Database Files",
@@ -46,16 +36,16 @@ const dialogFilters: DialogFilter[] = [
 	},
 ];
 
-export const newFile = action($currentFile, "newFile", async () => {
+export const newFile = action($files, "newFile", async () => {
 	const filePath = await save({ filters: dialogFilters });
 	if (typeof filePath === "string") {
-		await setCurrentFile(filePath);
+		await setFiles(filePath);
 	}
 });
 
-export const openFile = action($currentFile, "openFile", async () => {
+export const openFile = action($files, "openFile", async () => {
 	const filePath = await open({ filters: dialogFilters });
 	if (typeof filePath === "string") {
-		await setCurrentFile(filePath);
+		await setFiles(filePath);
 	}
 });
