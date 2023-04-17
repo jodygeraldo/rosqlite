@@ -1,4 +1,4 @@
-import { cn } from "../utils";
+import { cn } from "../../utils";
 import * as React from "react";
 
 const variantClasses = {
@@ -7,20 +7,27 @@ const variantClasses = {
 	ghost: "text-gray-12 hover:bg-gray-4 active:bg-gray-5",
 } satisfies Record<NonNullable<ButtonProps["variant"]>, string>;
 
+const sizeClasses = {
+	default: "px-2.5 py-1.5",
+	small: "px-2 py-1",
+} satisfies Record<NonNullable<ButtonProps["size"]>, string>;
+
 interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
 	variant?: "default" | "outline" | "ghost";
+	size?: "default" | "small";
 	className?: string;
 }
 
 const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(function Button(
-	{ variant = "default", className, ...props },
+	{ variant = "default", size = "default", className, ...props },
 	ref,
 ) {
 	return (
 		<button
 			className={cn(
-				"rounded px-2.5 py-1.5 text-sm font-semibold shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-8",
+				"rounded text-sm font-semibold transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-8",
 				variantClasses[variant],
+				sizeClasses[size],
 				className,
 			)}
 			ref={ref}
