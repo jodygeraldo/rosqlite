@@ -1,3 +1,3 @@
-# ODQSQLite
+# rosqlite
 
-Personal SQLite Viewer, because why not? 
+Just a read only SQLite viewer, because why not? 
