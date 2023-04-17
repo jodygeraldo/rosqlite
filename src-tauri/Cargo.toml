@@ -1,7 +1,7 @@
 [package]
-name = "odlsqlite"
-version = "0.0.0"
-description = "A Tauri App"
+name = "rosqlite"
+version = "1.0.0"
+description = "Just read only sqlite viewer"
 authors = ["you"]
 license = ""
 repository = ""
@@ -13,10 +13,12 @@ edition = "2021"
 tauri-build = { version = "1.2", features = [] }
 
 [dependencies]
-tauri = { version = "1.2", features = ["dialog-open", "dialog-save", "path-all", "shell-open"] }
+tauri = { version = "1.2", features = ["dialog-open"] }
 serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
 tauri-plugin-store = { git = "https://github.com/tauri-apps/plugins-workspace", branch = "dev" }
+tauri-plugin-persisted-scope = { git = "https://github.com/tauri-apps/plugins-workspace", branch = "dev" }
+tauri-plugin-window-state = { git = "https://github.com/tauri-apps/plugins-workspace", branch = "dev" }
 
 [dependencies.tauri-plugin-sqlite]
 git = "https://github.com/lzdyes/tauri-plugin-sqlite"
@@ -26,3 +28,10 @@ tag = "v0.1.1"
 # this feature is used for production builds or when `devPath` points to the filesystem
 # DO NOT REMOVE!!
 custom-protocol = ["tauri/custom-protocol"]
+
+[profile.release]
+panic = "abort"   # Strip expensive panic clean-up logic
+codegen-units = 1 # Compile crates one after another so the compiler can optimize better
+lto = true        # Enables link to optimizations
+opt-level = "s"   # Optimize for binary size
+strip = true      # Remove debug symbols
