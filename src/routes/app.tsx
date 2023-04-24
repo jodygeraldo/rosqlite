@@ -5,9 +5,12 @@ import { openFileDialog } from "../utils/recent-file";
 import {
 	CircleStackIcon,
 	FolderOpenIcon,
+	InformationCircleIcon,
 	TableCellsIcon,
 } from "@heroicons/react/20/solid";
 import * as Tooltip from "@radix-ui/react-tooltip";
+import { getVersion } from "@tauri-apps/api/app";
+import { message } from "@tauri-apps/api/dialog";
 import {
 	NavLink,
 	Outlet,
@@ -57,10 +60,10 @@ export function Component() {
 	return (
 		<div>
 			<Tooltip.Provider>
-				<nav className="fixed inset-y-0 left-0 z-40 flex w-20 flex-col overflow-y-auto border-r border-gray-6 bg-gray-2">
+				<div className="fixed inset-y-0 left-0 z-40 flex w-20 flex-col justify-between overflow-y-auto border-r border-gray-6 bg-gray-2 py-6">
 					<fetcher.Form
 						method="POST"
-						className="mt-6 flex items-center justify-center"
+						className="flex items-center justify-center"
 					>
 						<Tooltip.Root>
 							<Tooltip.Trigger asChild>
@@ -68,7 +71,7 @@ export function Component() {
 									type="submit"
 									name="intent"
 									value="open"
-									className="flex rounded-md p-3 text-gray-11 transition-colors hover:bg-gray-4 hover:text-gray-12 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-8 active:bg-gray-5"
+									className="flex rounded-md p-4 text-gray-11 transition-colors hover:bg-gray-4 hover:text-gray-12 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-8 active:bg-gray-5"
 								>
 									<span className="sr-only">open file</span>
 									<FolderOpenIcon className="h-6 w-6 shrink-0" />
@@ -89,43 +92,77 @@ export function Component() {
 						</Tooltip.Root>
 					</fetcher.Form>
 
-					<ul className="flex flex-1 flex-col items-center justify-center space-y-2">
-						{navigations.map((item) => (
-							<Tooltip.Root key={item.name}>
-								<Tooltip.Trigger asChild>
-									<li>
-										<NavLink
-											to={item.path}
-											className={({ isActive }) =>
-												cn(
-													isActive
-														? "bg-gray-5 text-gray-12 hover:bg-gray-6"
-														: "text-gray-11 hover:bg-gray-4 hover:text-gray-12",
-													"group flex rounded-md p-3 transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-8",
-												)
-											}
-										>
-											<span className="sr-only">{item.name}</span>
-											<item.icon className="h-6 w-6 shrink-0" />
-										</NavLink>
-									</li>
-								</Tooltip.Trigger>
+					<nav className="flex items-center justify-center">
+						<ul className="space-y-2">
+							{navigations.map((item) => (
+								<Tooltip.Root key={item.name}>
+									<Tooltip.Trigger asChild>
+										<li>
+											<NavLink
+												to={item.path}
+												className={({ isActive }) =>
+													cn(
+														isActive
+															? "bg-gray-5 text-gray-12 hover:bg-gray-6"
+															: "text-gray-11 hover:bg-gray-4 hover:text-gray-12",
+														"group flex rounded-md p-4 transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-8",
+													)
+												}
+											>
+												<span className="sr-only">{item.name}</span>
+												<item.icon className="h-6 w-6 shrink-0" />
+											</NavLink>
+										</li>
+									</Tooltip.Trigger>
 
-								<Tooltip.Portal>
-									<Tooltip.Content
-										side="right"
-										className="z-50 rounded bg-overlay-11 px-2 py-1"
-									>
-										<Tooltip.Arrow className="fill-overlay-11" />
-										<span className="text-xs font-medium text-gray-12">
-											{item.name}
-										</span>
-									</Tooltip.Content>
-								</Tooltip.Portal>
-							</Tooltip.Root>
-						))}
-					</ul>
-				</nav>
+									<Tooltip.Portal>
+										<Tooltip.Content
+											side="right"
+											className="z-50 rounded bg-overlay-11 px-2 py-1"
+										>
+											<Tooltip.Arrow className="fill-overlay-11" />
+											<span className="text-xs font-medium text-gray-12">
+												{item.name}
+											</span>
+										</Tooltip.Content>
+									</Tooltip.Portal>
+								</Tooltip.Root>
+							))}
+						</ul>
+					</nav>
+
+					<div className="flex items-center justify-center">
+						<Tooltip.Root>
+							<Tooltip.Trigger asChild>
+								<button
+									type="button"
+									onClick={async () =>
+										await message(`App version: v${await getVersion()}`, {
+											title: "About rosqlite",
+											type: "info",
+										})
+									}
+									className="flex rounded-md p-4 text-gray-11 transition-colors hover:bg-gray-4 hover:text-gray-12 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-8 active:bg-gray-5"
+								>
+									<span className="sr-only">About rosqlite</span>
+									<InformationCircleIcon className="h-6 w-6 shrink-0" />
+								</button>
+							</Tooltip.Trigger>
+
+							<Tooltip.Portal>
+								<Tooltip.Content
+									side="right"
+									className="z-50 rounded bg-overlay-11 px-2 py-1"
+								>
+									<Tooltip.Arrow className="fill-overlay-11" />
+									<span className="text-xs font-medium text-gray-12">
+										About rosqlite
+									</span>
+								</Tooltip.Content>
+							</Tooltip.Portal>
+						</Tooltip.Root>
+					</div>
+				</div>
 			</Tooltip.Provider>
 
 			<div className="pl-20">

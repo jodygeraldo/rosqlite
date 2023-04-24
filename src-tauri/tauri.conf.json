@@ -15,7 +15,8 @@
 			"all": false,
 			"dialog": {
 				"all": false,
-				"open": true
+				"open": true,
+				"message": true
 			}
 		},
 		"bundle": {
