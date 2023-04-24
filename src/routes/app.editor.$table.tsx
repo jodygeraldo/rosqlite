@@ -5,7 +5,7 @@ import {
 	THeadData,
 	TRow,
 	Table,
-} from "../components/Table";
+} from "../components/table";
 import { selectTable } from "../services/db";
 import { cn } from "../utils";
 import { LoaderData as AppLoaderData } from "./app";
