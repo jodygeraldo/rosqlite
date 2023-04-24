@@ -14,6 +14,7 @@ import * as React from "react";
 import {
 	LoaderFunctionArgs,
 	useLoaderData,
+	useRevalidator,
 	useRouteLoaderData,
 } from "react-router-dom";
 import { z } from "zod";
@@ -39,6 +40,15 @@ export function Component() {
 
 	const isAnyIndex = tableIndexes.length > 0;
 	const tableIndexKeys = isAnyIndex ? Object.keys(tableIndexes[0]) : [];
+
+	const revalidator = useRevalidator();
+
+	React.useEffect(() => {
+		const interval = setInterval(() => {
+			revalidator.revalidate();
+		}, 3000);
+		return () => clearInterval(interval);
+	}, []);
 
 	return (
 		<Tabs.Root defaultValue="column">
