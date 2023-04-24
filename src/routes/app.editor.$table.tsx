@@ -12,10 +12,12 @@ import { cn } from "../utils";
 import { LoaderData as AppLoaderData } from "./app";
 import { KeyIcon } from "@heroicons/react/20/solid";
 import qs from "fast-querystring";
+import * as React from "react";
 import {
 	LoaderFunctionArgs,
 	NavLink,
 	useLoaderData,
+	useRevalidator,
 	useRouteLoaderData,
 } from "react-router-dom";
 import { z } from "zod";
@@ -53,6 +55,15 @@ export function Component() {
 	const { tables } = useRouteLoaderData("app") as AppLoaderData;
 	const tableColumn = tables.find((table) => table.name === tableName);
 	if (!tableColumn) throw new Error("Table not found");
+
+	const revalidator = useRevalidator();
+
+	React.useEffect(() => {
+		const interval = setInterval(() => {
+			revalidator.revalidate();
+		}, 3000);
+		return () => clearInterval(interval);
+	}, []);
 
 	return (
 		<div>
