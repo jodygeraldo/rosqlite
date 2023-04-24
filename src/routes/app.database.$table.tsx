@@ -7,7 +7,6 @@ import {
 	Table,
 } from "../components/table";
 import { getTableIndexes } from "../services/db";
-import { cn } from "../utils";
 import { LoaderData as AppLoaderData } from "./app";
 import * as Tabs from "@radix-ui/react-tabs";
 import * as React from "react";

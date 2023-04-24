@@ -9,7 +9,6 @@ import {
 } from "@heroicons/react/20/solid";
 import * as Tooltip from "@radix-ui/react-tooltip";
 import {
-	LoaderFunctionArgs,
 	NavLink,
 	Outlet,
 	ScrollRestoration,
