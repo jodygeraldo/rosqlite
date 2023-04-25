@@ -1,6 +1,6 @@
 [package]
 name = "rosqlite"
-version = "1.0.0"
+version = "1.1.0"
 description = "Just read only sqlite viewer"
 authors = ["you"]
 license = ""
