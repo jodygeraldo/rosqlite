@@ -1,8 +1,8 @@
+import { getFirstTable } from "../services/db";
 import { localStore } from "../utils";
-import { DialogFilter, open, save } from "@tauri-apps/api/dialog";
+import { message, open } from "@tauri-apps/api/dialog";
 
 const store = localStore();
-
 const RECENT_FILES = "recent-files";
 
 async function getRecentFiles() {
@@ -36,7 +36,17 @@ async function openFileDialog() {
 	});
 
 	if (typeof filepath === "string") {
-		return await setRecentFile(filepath);
+		const firstTable = await getFirstTable(filepath);
+
+		if (firstTable) {
+			await setRecentFile(filepath);
+			return firstTable;
+		} else {
+			await message("You need to atleast one table in database file", {
+				title: "No table found",
+				type: "error",
+			});
+		}
 	}
 }
 

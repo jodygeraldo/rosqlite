@@ -1,9 +1,12 @@
+import { OpenFileButton } from "../components/OpenFileButton";
 import { Button } from "../components/ui/button";
+import { getFirstTable } from "../services/db";
 import {
 	getRecentFiles,
 	openFileDialog,
 	setRecentFile,
 } from "../utils/recent-file";
+import { message } from "@tauri-apps/api/dialog";
 import qs from "fast-querystring";
 import {
 	ActionFunctionArgs,
@@ -18,20 +21,32 @@ export async function action({ request }: ActionFunctionArgs) {
 	const Schema = z.object({
 		intent: z.literal("open"),
 		filepath: z.string().optional(),
+		redirectTo: z.string().optional(),
 	});
 	const data = Schema.parse(query);
 
-	if (typeof data.filepath === "string") {
-		await setRecentFile(data.filepath);
-		throw redirect("/app/editor");
+	if (data.filepath) {
+		const firstTable = await getFirstTable(data.filepath);
+		if (firstTable) {
+			await setRecentFile(data.filepath);
+			throw redirect(`/app/${firstTable}/row`);
+		} else {
+			await message("You need to atleast one table in database file", {
+				title: "No table found",
+				type: "error",
+			});
+			return null;
+		}
 	}
 
-	const success = await openFileDialog();
-
-	if (success) {
-		throw redirect("/app/editor");
+	const firstTable = await openFileDialog();
+	if (firstTable) {
+		throw redirect(`/app/${firstTable}/row`);
 	}
 
+	if (data.redirectTo) {
+		throw redirect(data.redirectTo);
+	}
 	return null;
 }
 
@@ -54,9 +69,7 @@ export function Component() {
 							</h3>
 						</div>
 						<Form method="POST" className="ml-4 mt-2">
-							<Button type="submit" name="intent" value="open">
-								Open file
-							</Button>
+							<OpenFileButton />
 						</Form>
 					</div>
 				</div>

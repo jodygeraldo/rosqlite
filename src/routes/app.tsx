@@ -1,137 +1,66 @@
+import { OpenFileButton } from "../components/OpenFileButton";
 import { Button } from "../components/ui/button";
-import { getTableInfo } from "../services/db";
+import { getTableNames } from "../services/db";
 import { cn } from "../utils";
-import { openFileDialog } from "../utils/recent-file";
-import {
-	CircleStackIcon,
-	FolderOpenIcon,
-	InformationCircleIcon,
-	TableCellsIcon,
-} from "@heroicons/react/20/solid";
+import { InformationCircleIcon } from "@heroicons/react/20/solid";
 import * as Tooltip from "@radix-ui/react-tooltip";
 import { getVersion } from "@tauri-apps/api/app";
 import { message } from "@tauri-apps/api/dialog";
 import {
-	NavLink,
+	Form,
 	Outlet,
 	ScrollRestoration,
-	redirect,
-	useFetcher,
 	useLoaderData,
 	useLocation,
 	useNavigate,
+	useParams,
 } from "react-router-dom";
 
-export async function action() {
-	const success = await openFileDialog();
-
-	if (success) {
-		throw redirect("/app/editor");
-	}
-
-	return null;
-}
-
-export type LoaderData = Awaited<ReturnType<typeof loader>>;
 export async function loader() {
-	const tables = await getTableInfo();
-	return { tables };
+	const tableNames = await getTableNames();
+	return { tableNames };
 }
-
-const navigations = [
-	{
-		name: "Table",
-		path: "/app/editor",
-		icon: TableCellsIcon,
-	},
-	{
-		name: "Database",
-		path: "/app/database",
-		icon: CircleStackIcon,
-	},
-] as const;
 
 export function Component() {
-	const { tables } = useLoaderData() as LoaderData;
-	const fetcher = useFetcher();
+	const { tableNames } = useLoaderData() as Awaited<ReturnType<typeof loader>>;
 	const navigate = useNavigate();
 	const location = useLocation();
+	const { tab } = useParams();
 
 	return (
 		<div>
-			<Tooltip.Provider>
-				<div className="fixed inset-y-0 left-0 z-40 flex w-20 flex-col justify-between overflow-y-auto border-r border-gray-6 bg-gray-2 py-6">
-					<fetcher.Form
-						method="POST"
-						className="flex items-center justify-center"
-					>
-						<Tooltip.Root>
-							<Tooltip.Trigger asChild>
-								<button
-									type="submit"
-									name="intent"
-									value="open"
-									className="flex rounded-md p-4 text-gray-11 transition-colors hover:bg-gray-4 hover:text-gray-12 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-8 active:bg-gray-5"
-								>
-									<span className="sr-only">open file</span>
-									<FolderOpenIcon className="h-6 w-6 shrink-0" />
-								</button>
-							</Tooltip.Trigger>
+			<aside className="fixed inset-y-0 left-0 w-72 overflow-y-auto border-r border-gray-6 bg-gray-2 px-4 py-6">
+				<Tooltip.Provider>
+					<div className="flex items-center justify-between">
+						<Form
+							action="/"
+							method="POST"
+							className="flex items-center justify-center"
+						>
+							<input
+								type="hidden"
+								name="redirectTo"
+								value={location.pathname}
+							/>
+							<Tooltip.Root>
+								<Tooltip.Trigger asChild>
+									<OpenFileButton />
+								</Tooltip.Trigger>
 
-							<Tooltip.Portal>
-								<Tooltip.Content
-									side="right"
-									className="z-50 rounded bg-overlay-11 px-2 py-1"
-								>
-									<Tooltip.Arrow className="fill-overlay-11" />
-									<span className="text-xs font-medium text-gray-12">
-										Open file
-									</span>
-								</Tooltip.Content>
-							</Tooltip.Portal>
-						</Tooltip.Root>
-					</fetcher.Form>
+								<Tooltip.Portal>
+									<Tooltip.Content
+										side="right"
+										className="z-50 rounded bg-overlay-12 px-2 py-1"
+									>
+										<Tooltip.Arrow className="fill-overlay-11" />
+										<span className="text-xs font-medium text-gray-12">
+											Open file
+										</span>
+									</Tooltip.Content>
+								</Tooltip.Portal>
+							</Tooltip.Root>
+						</Form>
 
-					<nav className="flex items-center justify-center">
-						<ul className="space-y-2">
-							{navigations.map((item) => (
-								<Tooltip.Root key={item.name}>
-									<Tooltip.Trigger asChild>
-										<li>
-											<NavLink
-												to={item.path}
-												className={({ isActive }) =>
-													cn(
-														isActive
-															? "bg-gray-5 text-gray-12 hover:bg-gray-6"
-															: "text-gray-11 hover:bg-gray-4 hover:text-gray-12",
-														"group flex rounded-md p-4 transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-8",
-													)
-												}
-											>
-												<span className="sr-only">{item.name}</span>
-												<item.icon className="h-6 w-6 shrink-0" />
-											</NavLink>
-										</li>
-									</Tooltip.Trigger>
-
-									<Tooltip.Portal>
-										<Tooltip.Content
-											side="right"
-											className="z-50 rounded bg-overlay-11 px-2 py-1"
-										>
-											<Tooltip.Arrow className="fill-overlay-11" />
-											<span className="text-xs font-medium text-gray-12">
-												{item.name}
-											</span>
-										</Tooltip.Content>
-									</Tooltip.Portal>
-								</Tooltip.Root>
-							))}
-						</ul>
-					</nav>
-
-					<div className="flex items-center justify-center">
 						<Tooltip.Root>
 							<Tooltip.Trigger asChild>
 								<button
@@ -142,17 +71,17 @@ export function Component() {
 											type: "info",
 										})
 									}
-									className="flex rounded-md p-4 text-gray-11 transition-colors hover:bg-gray-4 hover:text-gray-12 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-8 active:bg-gray-5"
+									className="flex rounded-md p-2 text-gray-11 transition-colors hover:bg-gray-4 hover:text-gray-12 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-8 active:bg-gray-5"
 								>
 									<span className="sr-only">About rosqlite</span>
-									<InformationCircleIcon className="h-6 w-6 shrink-0" />
+									<InformationCircleIcon className="h-4 w-4 shrink-0" />
 								</button>
 							</Tooltip.Trigger>
 
 							<Tooltip.Portal>
 								<Tooltip.Content
 									side="right"
-									className="z-50 rounded bg-overlay-11 px-2 py-1"
+									className="z-50 rounded bg-overlay-12 px-2 py-1"
 								>
 									<Tooltip.Arrow className="fill-overlay-11" />
 									<span className="text-xs font-medium text-gray-12">
@@ -162,48 +91,36 @@ export function Component() {
 							</Tooltip.Portal>
 						</Tooltip.Root>
 					</div>
+				</Tooltip.Provider>
+
+				<div className="mt-8 flex items-center justify-between border-b border-gray-6 pb-2">
+					<h3 className="text-base font-semibold leading-6 text-gray-12">
+						Tables ({tableNames.length})
+					</h3>
 				</div>
-			</Tooltip.Provider>
 
-			<div className="pl-20">
-				<aside className="fixed inset-y-0 left-20 w-72 overflow-y-auto border-r border-gray-6 bg-gray-2 px-4 py-6">
-					<div className="flex items-center justify-between border-b border-gray-6 pb-2">
-						<h3 className="text-base font-semibold leading-6 text-gray-12">
-							Tables ({tables.length})
-						</h3>
-					</div>
-
-					<div className="mt-2 flex flex-col ">
-						{tables.map(({ name }) => (
-							<Button
-								onClick={() =>
-									navigate(
-										`${
-											location.pathname.startsWith("/app/editor")
-												? "/app/editor/"
-												: "/app/database/"
-										}${name}`,
-									)
-								}
-								key={name}
-								variant="ghost"
-								size="small"
-								className={cn(
-									location.pathname.endsWith(name)
-										? "text-gray-12"
-										: "text-gray-11",
-									"text-left",
-								)}
-							>
-								{name}
-							</Button>
-						))}
-					</div>
-				</aside>
-
-				<div className="pl-72">
-					<Outlet />
+				<div className="mt-2 flex flex-col ">
+					{tableNames.map((name) => (
+						<Button
+							onClick={() => navigate(`/app/${name}/${tab}`)}
+							key={name}
+							variant="ghost"
+							size="small"
+							className={cn(
+								location.pathname === `/app/${name}/${tab}`
+									? "text-gray-12"
+									: "text-gray-11",
+								"text-left",
+							)}
+						>
+							{name}
+						</Button>
+					))}
 				</div>
+			</aside>
+
+			<div className="pl-72">
+				<Outlet />
 			</div>
 
 			<ScrollRestoration />

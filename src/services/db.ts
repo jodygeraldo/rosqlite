@@ -20,23 +20,28 @@ export type TableInfo = {
 	pk: number;
 };
 
-export async function getTables() {
-	const db = await conn();
-	return await db.select<{ name: string }[]>(
-		"SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%'",
+export async function getFirstTable(filepath: string) {
+	const db = await SQLite.open(filepath);
+	const firstTable = await db.select<{ name: string }[]>(
+		"SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%' LIMIT 1",
 	);
+
+	if (firstTable.length === 1) {
+		return firstTable[0].name;
+	}
 }
 
-export async function getTableInfo() {
+export async function getTableNames(filePath?: string) {
 	const db = await conn();
-	const tables = await getTables();
-
-	return await Promise.all(
-		tables.map(async ({ name }) => ({
-			name,
-			columns: await db.select<TableInfo[]>(`PRAGMA table_info(${name})`),
-		})),
+	const tablesName = await db.select<{ name: string }[]>(
+		"SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%'",
 	);
+	return tablesName.map(({ name }) => name);
+}
+
+export async function getTableColumns(name: string) {
+	const db = await conn();
+	return await db.select<TableInfo[]>(`PRAGMA table_info(${name})`);
 }
 
 export type PragmaIndexList = {
@@ -72,6 +77,7 @@ export async function getTableIndexes(name: string) {
 
 export async function selectTable<TRow extends unknown>(
 	tableName: string,
+	limit: number,
 	offset: number = 0,
 ): Promise<{ count: number; rows: TRow[] }> {
 	const db = await conn();
@@ -79,7 +85,9 @@ export async function selectTable<TRow extends unknown>(
 		db.select<{ count: number }[]>(
 			`SELECT COUNT(*) as count FROM ${tableName}`,
 		),
-		db.select<TRow[]>(`SELECT * FROM ${tableName} LIMIT 50 OFFSET ${offset}`),
+		db.select<TRow[]>(
+			`SELECT * FROM ${tableName} LIMIT ${limit} OFFSET ${offset}`,
+		),
 	]);
 
 	return { count: count[0].count, rows };

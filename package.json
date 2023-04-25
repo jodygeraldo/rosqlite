@@ -20,6 +20,7 @@
 	},
 	"dependencies": {
 		"@heroicons/react": "^2.0.17",
+		"@radix-ui/react-select": "^1.2.1",
 		"@radix-ui/react-tabs": "^1.0.3",
 		"@radix-ui/react-tooltip": "^1.0.5",
 		"@tauri-apps/api": "^1.2.0",

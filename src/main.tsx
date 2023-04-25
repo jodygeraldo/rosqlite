@@ -16,38 +16,9 @@ const router = createBrowserRouter(
 			lazy: () => import("./routes/app"),
 			children: [
 				{
-					id: "app.editor",
-					path: "editor",
-					lazy: () => import("./routes/app.editor"),
-					children: [
-						{
-							id: "app.editor._index",
-							index: true,
-							lazy: () => import("./routes/app.+shared._index"),
-						},
-						{
-							id: "app.editor.$table",
-							path: ":table",
-							lazy: () => import("./routes/app.editor.$table"),
-						},
-					],
-				},
-				{
-					id: "app.database",
-					path: "database",
-					lazy: () => import("./routes/app.database"),
-					children: [
-						{
-							id: "app.database._index",
-							index: true,
-							lazy: () => import("./routes/app.+shared._index"),
-						},
-						{
-							id: "app.database.$table",
-							path: ":table",
-							lazy: () => import("./routes/app.database.$table"),
-						},
-					],
+					id: "app.$table.$tab",
+					path: ":table/:tab",
+					lazy: () => import("./routes/app.$table.$tab"),
 				},
 			],
 		},

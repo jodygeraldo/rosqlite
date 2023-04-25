@@ -25,7 +25,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(function Button(
 	return (
 		<button
 			className={cn(
-				"rounded text-sm font-semibold transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-8",
+				"inline-flex items-center rounded text-sm font-semibold transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-8",
 				variantClasses[variant],
 				sizeClasses[size],
 				className,
